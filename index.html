@@ -274,11 +274,15 @@
   // CONFIGURAÇÃO — altere a URL do webhook n8n aqui
   // ================================================================
   const WEBHOOK_URL = 'https://dtgbsn8n.eastus.cloudapp.azure.com/webhook/transcricao-reuniao-dev';
+  const AUTH_KEY    = 'dt-sales-key-2024'; // segredo do Auth Check do webhook de transcrição (não é chave de namespace)
   const TIMEOUT_MS  = 10 * 60 * 1000; // 10 minutos
 
   // ── LOGIN ────────────────────────────────────────────────────────
-  const AUTH_URL  = 'https://dtgbsn8n.eastus.cloudapp.azure.com/webhook/users';
-  const AUTH_KEY  = 'dt-sales-key-2024';
+  // USERS_API_KEY resolve o namespace 'corporativo' no backend — controla quem
+  // consegue logar aqui (namespace = 'corporativo' OU 'corporativo' em extra_namespaces).
+  // Independente de AUTH_KEY, que é só o segredo do webhook de transcrição (não é lookup de namespace).
+  const AUTH_URL      = 'https://dtgbsn8n.eastus.cloudapp.azure.com/webhook/users';
+  const USERS_API_KEY = 'corporativo-key-2024';
 
   let currentUser = null;
 
@@ -303,7 +307,7 @@
       try {
         const res = await fetch(AUTH_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-API-Key': AUTH_KEY },
+          headers: { 'Content-Type': 'application/json', 'X-API-Key': USERS_API_KEY },
           body: JSON.stringify({ action: 'login', email, password })
         });
         const data = await res.json();
@@ -371,7 +375,7 @@
       try {
         const res = await fetch(AUTH_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-API-Key': AUTH_KEY },
+          headers: { 'Content-Type': 'application/json', 'X-API-Key': USERS_API_KEY },
           body: JSON.stringify({ action: 'change_password', user_id: currentUser.id, new_password: newPwd })
         });
         const data = await res.json();
